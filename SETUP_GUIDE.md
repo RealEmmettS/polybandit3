@@ -14,10 +14,14 @@
 5. [Setup Options](#setup-options)
 6. [Option A: Raspberry Pi with Buildroot (Advanced)](#option-a-raspberry-pi-with-buildroot-advanced)
 7. [Option B: Raspberry Pi OS / Debian (Easier)](#option-b-raspberry-pi-os--debian-easier)
-8. [Option C: Virtual Machine](#option-c-virtual-machine)
-9. [Playing the Game](#playing-the-game)
-10. [Available Challenge Sets](#available-challenge-sets)
-11. [Troubleshooting](#troubleshooting)
+8. [Option C: Virtual Machine (Linux/Windows)](#option-c-virtual-machine-linuxwindows)
+9. [Option D: macOS Virtualization](#option-d-macos-virtualization)
+   - [Parallels Desktop](#parallels-desktop-recommended-for-mac)
+   - [VirtualBox on Mac](#virtualbox-on-mac-free)
+   - [UTM](#utm-free-apple-silicon-native)
+10. [Playing the Game](#playing-the-game)
+11. [Available Challenge Sets](#available-challenge-sets)
+12. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -169,7 +173,18 @@ You have several ways to run this project:
 |--------|------------|----------|--------------|
 | A: Raspberry Pi + Buildroot | Hard | Raspberry Pi | Original experience |
 | B: Raspberry Pi OS / Debian | Easy | Raspberry Pi or any PC | Works great |
-| C: Virtual Machine | Medium | Any computer | Good for testing |
+| C: Virtual Machine (Linux/Windows) | Medium | Linux/Windows PC | Good for testing |
+| D: macOS Virtualization | Easy-Medium | Mac (Intel or Apple Silicon) | Great for Mac users |
+
+### macOS-Specific Options
+
+| Tool | Cost | Apple Silicon | Intel Mac | Best For |
+|------|------|---------------|-----------|----------|
+| Parallels Desktop | $$$  | Excellent | Excellent | Best performance, easiest |
+| VirtualBox | Free | Limited* | Good | Free option for Intel Macs |
+| UTM | Free | Excellent | Good | Free, native Apple Silicon |
+
+*VirtualBox on Apple Silicon requires running x86 VMs in emulation mode (slow)
 
 ---
 
@@ -351,9 +366,9 @@ su - bandit1
 
 ---
 
-## Option C: Virtual Machine
+## Option C: Virtual Machine (Linux/Windows)
 
-Run Buildroot in a VM on your regular computer.
+Run Buildroot in a VM on your Linux or Windows computer.
 
 ### Using QEMU (Free, Cross-Platform)
 
@@ -388,6 +403,322 @@ qemu-system-arm -M versatilepb -kernel output/images/zImage \
 2. Convert the image for your VM software
 3. Create a new VM and attach the disk image
 4. Boot and proceed with installation
+
+---
+
+## Option D: macOS Virtualization
+
+This section covers running PolyLinux Game on a Mac using virtualization software.
+
+### Which Tool Should I Use?
+
+**Quick Decision Guide:**
+
+```
+Do you have an Apple Silicon Mac (M1/M2/M3/M4)?
+├── Yes → Use UTM (free) or Parallels (paid, fastest)
+└── No (Intel Mac) → Use VirtualBox (free) or Parallels (paid)
+
+Do you want the easiest setup?
+├── Yes → Use Parallels (paid) - it "just works"
+└── No, I want free → Use UTM (Apple Silicon) or VirtualBox (Intel)
+```
+
+---
+
+### Parallels Desktop (Recommended for Mac)
+
+Parallels is the most polished VM solution for macOS. It costs money but provides the best experience.
+
+#### What You Need
+
+- Parallels Desktop ($99/year or $129 one-time for Standard)
+- Download from: https://www.parallels.com/
+- macOS 10.15 or later
+- At least 8GB RAM (16GB recommended)
+- 20GB free disk space
+
+#### Step 1: Install Parallels
+
+1. Download Parallels from their website
+2. Open the `.dmg` file and drag to Applications
+3. Launch Parallels and complete the setup wizard
+4. Sign in or create a Parallels account
+
+#### Step 2: Create a Linux VM
+
+**Easiest Method (Recommended): Install Debian/Ubuntu**
+
+1. Open Parallels Desktop
+2. Click **File → New**
+3. Select **"Download Debian GNU/Linux"** or **"Download Ubuntu"**
+   - Parallels will download and install automatically
+   - This takes 5-10 minutes
+4. Once installed, start the VM
+
+**Alternative: Install Raspberry Pi OS Desktop**
+
+1. Download Raspberry Pi OS from: https://www.raspberrypi.com/software/operating-systems/
+   - Choose "Raspberry Pi OS with desktop" (64-bit for ARM Macs, 32-bit for Intel)
+2. In Parallels: **File → New → Install Windows or another OS from DVD or image**
+3. Select the downloaded `.img` file
+4. Follow the prompts to create the VM
+
+#### Step 3: Install PolyLinux Game
+
+Once your Linux VM is running:
+
+```bash
+# Open Terminal in your VM
+
+# Update packages
+sudo apt update
+
+# Install git
+sudo apt install git -y
+
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/polybandit3.git
+cd polybandit3
+
+# Make scripts executable
+chmod +x *.sh
+
+# Run the installer (choose one)
+sudo sh deb_installbandit.sh    # For Bandit levels
+# OR
+sudo sh install.sh              # For Basic levels
+```
+
+#### Step 4: Play!
+
+```bash
+# Switch to a level user
+su - basic1
+# or
+su - bandit1
+```
+
+#### Parallels Tips
+
+- **Shared Folders**: Parallels can share your Mac folders with the VM - easy file transfer
+- **Coherence Mode**: Run Linux apps alongside Mac apps (not needed for this project)
+- **Snapshots**: Take a snapshot before running installers so you can reset easily
+  - Click **Actions → Take Snapshot**
+
+---
+
+### VirtualBox on Mac (Free)
+
+VirtualBox is free and works well on **Intel Macs**. On Apple Silicon, it runs in emulation mode which is slow.
+
+#### What You Need
+
+- VirtualBox: https://www.virtualbox.org/wiki/Downloads
+- A Linux ISO file (Debian or Ubuntu recommended)
+- For Intel Mac: Download the "macOS hosts" version
+- For Apple Silicon: VirtualBox 7.0+ has experimental ARM support, but UTM is better
+
+#### Step 1: Install VirtualBox
+
+1. Download VirtualBox for macOS
+2. Open the `.dmg` file
+3. Double-click the installer package
+4. **Important**: Go to **System Preferences → Security & Privacy**
+   - Click "Allow" for Oracle (the kernel extension needs permission)
+5. Restart your Mac if prompted
+
+#### Step 2: Download a Linux ISO
+
+Download one of these:
+- **Debian** (Recommended): https://www.debian.org/download
+  - Get the "netinst" ISO (~400MB)
+- **Ubuntu Server**: https://ubuntu.com/download/server
+  - Get the LTS version (~1.5GB)
+
+#### Step 3: Create the Virtual Machine
+
+1. Open VirtualBox
+2. Click **New**
+3. Configure:
+   - **Name**: `PolyLinux` (or anything you want)
+   - **Type**: Linux
+   - **Version**: Debian (64-bit) or Ubuntu (64-bit)
+4. Click **Next**
+5. **Memory**: Set to at least 2048 MB (2GB), 4096 MB (4GB) is better
+6. **Hard disk**: Create a virtual hard disk now
+   - **VDI** format
+   - **Dynamically allocated**
+   - **Size**: 20 GB
+7. Click **Create**
+
+#### Step 4: Mount the ISO and Install
+
+1. Select your new VM, click **Settings**
+2. Go to **Storage**
+3. Click the empty CD icon under "Controller: IDE"
+4. Click the CD icon on the right → **Choose a disk file**
+5. Select your downloaded Linux ISO
+6. Click **OK**
+7. Click **Start** to boot the VM
+8. Follow the Linux installer prompts:
+   - Choose language, keyboard, timezone
+   - Create a user account
+   - Use default partitioning
+   - Install SSH server (optional but helpful)
+
+#### Step 5: Install PolyLinux Game
+
+After Linux is installed and running:
+
+```bash
+# Update system
+sudo apt update
+
+# Install git
+sudo apt install git -y
+
+# Clone the repo
+git clone https://github.com/YOUR_USERNAME/polybandit3.git
+cd polybandit3
+
+# Make executable and run
+chmod +x *.sh
+sudo sh deb_installbandit.sh
+```
+
+#### VirtualBox Tips
+
+- **Guest Additions**: Install for better performance
+  ```bash
+  sudo apt install virtualbox-guest-additions-iso
+  ```
+- **Shared Clipboard**: Enable in **Devices → Shared Clipboard → Bidirectional**
+- **Snapshots**: Use **Machine → Take Snapshot** before running installers
+
+---
+
+### UTM (Free, Apple Silicon Native)
+
+UTM is a free, open-source VM app designed for Mac. It runs ARM Linux natively on Apple Silicon Macs, making it fast and efficient.
+
+**Website**: https://mac.getutm.app/
+
+#### What You Need
+
+- UTM (free from website, or $9.99 on App Store to support developers)
+- macOS 11 Big Sur or later
+- A Linux ARM64 image (for Apple Silicon) or x86 image (for Intel)
+
+#### Step 1: Install UTM
+
+**Free Method:**
+1. Go to https://mac.getutm.app/
+2. Click **Download**
+3. Open the `.dmg` and drag UTM to Applications
+
+**App Store Method ($9.99):**
+1. Search "UTM" in the Mac App Store
+2. Purchase and install (supports the developers, auto-updates)
+
+#### Step 2: Download a Linux Image
+
+**For Apple Silicon Macs (M1/M2/M3/M4):**
+
+Option A - Pre-built VM (Easiest):
+1. Go to https://mac.getutm.app/gallery/
+2. Download "Debian 12" or "Ubuntu 22.04"
+3. Double-click the `.utm` file to import
+
+Option B - Manual ISO:
+1. Download Debian ARM64: https://www.debian.org/distrib/netinst
+   - Select **arm64** architecture
+2. Download Ubuntu Server ARM64: https://ubuntu.com/download/server/arm
+
+**For Intel Macs:**
+- Download standard x86_64 Linux ISOs (same as VirtualBox section)
+
+#### Step 3: Create the VM (If Using ISO)
+
+1. Open UTM
+2. Click **Create a New Virtual Machine**
+3. Select **Virtualize** (Apple Silicon) or **Emulate** (Intel running ARM, or vice versa)
+4. Select **Linux**
+5. Click **Browse** and select your ISO file
+6. Configure hardware:
+   - **Memory**: 2048 MB minimum, 4096 MB recommended
+   - **CPU Cores**: 2-4 cores
+7. Configure storage:
+   - **Size**: 20 GB
+8. Click **Save**
+
+#### Step 4: Install Linux
+
+1. Select your VM and click the **Play** button
+2. Follow the Linux installer:
+   - Language, keyboard, timezone
+   - Create user account
+   - Use guided partitioning
+   - Install SSH server (recommended)
+3. After installation, shut down the VM
+4. In UTM, go to the VM's settings:
+   - Remove the ISO from the CD/DVD drive (or it will boot to installer again)
+5. Start the VM again - it should boot into your new Linux install
+
+#### Step 5: Install PolyLinux Game
+
+```bash
+# In your Linux VM terminal
+
+# Update and install git
+sudo apt update
+sudo apt install git -y
+
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/polybandit3.git
+cd polybandit3
+
+# Run installer
+chmod +x *.sh
+sudo sh deb_installbandit.sh
+```
+
+#### Step 6: Play!
+
+```bash
+su - basic1
+```
+
+#### UTM Tips
+
+- **SPICE Guest Tools**: Install for better integration
+  ```bash
+  sudo apt install spice-vdagent spice-webdavd
+  ```
+- **Shared Directory**: In VM settings, add a shared directory for easy file transfer
+- **Snapshots**: Right-click VM → **Clone** to create a backup before installing
+
+---
+
+### macOS Virtualization: Quick Comparison
+
+| Feature | Parallels | VirtualBox | UTM |
+|---------|-----------|------------|-----|
+| **Price** | $99+/year | Free | Free |
+| **Apple Silicon** | Excellent | Poor (emulation) | Excellent |
+| **Intel Mac** | Excellent | Good | Good |
+| **Ease of Use** | Easiest | Medium | Easy |
+| **Performance** | Best | Good (Intel) | Very Good |
+| **Auto-download Linux** | Yes | No | Gallery available |
+| **Snapshot Support** | Yes | Yes | Clone only |
+
+### Recommendation Summary
+
+- **Apple Silicon Mac + Want Free**: Use **UTM**
+- **Apple Silicon Mac + Want Best**: Use **Parallels**
+- **Intel Mac + Want Free**: Use **VirtualBox**
+- **Intel Mac + Want Best**: Use **Parallels**
+- **Just want it to work with minimal effort**: Use **Parallels** (any Mac)
 
 ---
 
@@ -562,3 +893,4 @@ The input is only used to generate your unique challenge hash. There is no netwo
 ---
 
 *Last updated: 2025-11-25*
+*macOS virtualization section added: 2025-11-25*
